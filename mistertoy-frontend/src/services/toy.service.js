@@ -55,6 +55,8 @@ function remove(toyId) {
 
 function save(toy) {
     if (toy._id) {
+        console.log(toy._id);
+
         return storageService.put(TOY_KEY, toy)
     } else {
         return storageService.post(TOY_KEY, toy)
@@ -94,7 +96,6 @@ function getDefaultFilter() {
 // TODO: make it random
 function getRandomToy() {
     return {
-        _id: 't101',
         name: 'Talking Doll',
         price: 123,
         labels: ['Doll', 'Battery Powered', 'Baby'],
