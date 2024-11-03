@@ -1,105 +1,101 @@
-import { utilService } from './util.service.js'
-import { storageService } from './async-storage.service.js'
+import { httpService } from './http.service'
 
-const TOY_KEY = 'toyDB'
-const labels = ['On wheels', 'Box game', 'Art', 'Baby', 'Doll', 'Puzzle',
-    'Outdoor', 'Battery Powered']
+const BASE_URL = 'toy/'
 
-_createToys()
+const labels = [
+    'On wheels',
+    'Box game',
+    'Art',
+    'Baby',
+    'Doll',
+    'Puzzle',
+    'Outdoor',
+    'Battery Powered',
+]
 
 export const toyService = {
     query,
     getById,
-    get,
-    remove,
     save,
+    remove,
+    getEmptyToy,
     getDefaultFilter,
-    getRandomToy,
-    getEmptyToy
-
+    getToyLabels,
+    getLabelCounts,
 }
-// For Debug (easy access from console):
-window.cs = toyService
 
 function query(filterBy = {}) {
-    return storageService.query(TOY_KEY)
-        .then(toys => {
-            if (filterBy.name) {
-                const regExp = new RegExp(filterBy.name, 'i')
-                toys = toys.filter(toy => regExp.test(toy.name))
-            }
-
-            if (filterBy.inStock !== 'all') {
-                toys = toys.filter(toy => (filterBy.inStock === 'Yes' ? toy.inStock : !toy.inStock))
-            }
-
-            return toys
-        })
+    return httpService.get(BASE_URL, filterBy)
 }
 
 function getById(toyId) {
-    return storageService.get(TOY_KEY, toyId)
-}
-
-function get(toyId) {
-    return storageService.get(TOY_KEY, toyId)
-        .then(toy => {
-            toy = _setNextPrevToyId(toy)
-            return toy
-        })
+    return httpService.get(BASE_URL + toyId)
 }
 
 function remove(toyId) {
-    return storageService.remove(TOY_KEY, toyId)
+    return httpService.delete(BASE_URL + toyId)
 }
 
 function save(toy) {
-    if (toy._id) {
-        console.log(toy._id);
-
-        return storageService.put(TOY_KEY, toy)
-    } else {
-        return storageService.post(TOY_KEY, toy)
-    }
-}
-
-function _createToys() {
-    let toys = utilService.loadFromStorage(TOY_KEY)
-    if (!toys || !toys.length) {
-        toys = []
-        const names = ['SnuggleSquad', 'CozyCritters', 'Hugger Heroes', 'BattleMasters', 'ArtLab Kids']
-        for (let i = 0; i < 10; i++) {
-            const name = names[utilService.getRandomIntInclusive(0, names.length - 1)]
-            toys.push(_createToy(name, utilService.getRandomIntInclusive(80, 300)))
-        }
-        utilService.saveToStorage(TOY_KEY, toys)
-    }
-}
-
-function getEmptyToy(price = 10, labels = ['Box game', 'Art'], inStock = true) {
-    return { price, labels, inStock }
-}
-
-function _createToy(name, price, labels, inStock) {
-
-    const toy = getEmptyToy(price, labels, inStock)
-    toy.name = name
-    toy._id = utilService.makeId()
-    toy.createdAt = Date.now()
-    return toy
+    const method = toy._id ? 'put' : 'post'
+    return httpService[method](BASE_URL, toy)
 }
 
 function getDefaultFilter() {
-    return { name: '', inStock: 'all', toyLabel: '' }
-}
-
-// TODO: make it random
-function getRandomToy() {
     return {
-        name: 'Talking Doll',
-        price: 123,
-        labels: ['Doll', 'Battery Powered', 'Baby'],
-        createdAt: 1631031801011,
-        inStock: true,
+        txt: '',
+        inStock: null,
+        labels: [],
+        pageIdx: 0,
+        sortBy: {
+            type: '',
+            desc: 1
+        }
     }
 }
+
+function getEmptyToy() {
+    return {
+        name: '',
+        price: '',
+        labels: _getRandomLabels(),
+    }
+}
+
+function getToyLabels() {
+    return [...labels]
+}
+
+function _getRandomLabels() {
+    const labelsCopy = [...labels]
+    const randomLabels = []
+    for (let i = 0; i < 2; i++) {
+        const randomIdx = Math.floor(Math.random() * labelsCopy.length)
+        randomLabels.push(labelsCopy.splice(randomIdx, 1)[0])
+    }
+    return randomLabels
+}
+
+function getLabelCounts() {
+    return query().then(({ toys }) => {
+        const labelCounts = {}
+
+        toys.forEach(toy => {
+            toy.labels.forEach(label => {
+                if (labelCounts[label]) {
+                    labelCounts[label]++
+                } else {
+                    labelCounts[label] = 1
+                }
+            })
+        })
+        const labelCountArray = Object.entries(labelCounts).map(
+            ([label, count]) => ({
+                label,
+                count,
+            })
+        )
+        return labelCountArray
+    })
+}
+
