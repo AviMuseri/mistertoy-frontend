@@ -1,58 +1,68 @@
-// const { useState, useEffect, useRef } = React
+import { useEffect, useRef, useState } from 'react'
+import { toyService } from '../services/toy.service'
+import { utilService } from '../services/util.service'
+import { ToySort } from './ToySort'
 
-import { useEffect, useRef, useState } from "react"
-import { utilService } from "../services/util.service.js"
 
+const toyLabels = toyService.getToyLabels()
 
 export function ToyFilter({ filterBy, onSetFilter }) {
-
     const [filterByToEdit, setFilterByToEdit] = useState({ ...filterBy })
-    onSetFilter = useRef(utilService.debounce(onSetFilter, 300))
+    const debouncedOnSetFilter = useRef(utilService.debounce(onSetFilter, 300))
 
     useEffect(() => {
-        onSetFilter.current(filterByToEdit)
+        debouncedOnSetFilter.current(filterByToEdit)
     }, [filterByToEdit])
 
     function handleChange({ target }) {
-        const field = target.name
-        let value = target.value
-
-        switch (target.type) {
-            case 'number':
-            case 'range':
-                value = +value || ''
-                break
-
-            case 'checkbox':
-                value = target.checked
-                break
-
-            default: break
+        let { value, name: field, type } = target
+        if (type === 'select-multiple') {
+            value = Array.from(target.selectedOptions, option => option.value || [])
         }
-
+        value = type === 'number' ? +value || '' : value
         setFilterByToEdit(prevFilter => ({ ...prevFilter, [field]: value }))
     }
 
-    return (
-        <section className="toy-filter full main-layout">
-            <h2>Toys Filter</h2>
-            <form >
-                <label htmlFor="">In stock:</label>
-                <select value={filterByToEdit.inStock} className="flex justify-center align-center" name="inStock" onChange={(ev) => handleChange(ev)}>
-                    <option value="all" >All</option>
-                    <option value="Yes" >Yes</option>
-                    <option value="no" >No</option>
-                </select>
-                <label htmlFor="name">Name:</label>
-                <input type="text"
-                    id="name"
-                    name="name"
-                    placeholder="By name"
-                    value={filterByToEdit.name}
-                    onChange={handleChange}
-                />
-            </form>
+    function onSubmitFilter(ev) {
+        ev.preventDefault()
+        onSetFilter(filterByToEdit)
+    }
 
+    const { txt, inStock, labels } = filterByToEdit
+
+    return (
+        <section className="toy-filter">
+            <h3>Toys Filter/Sort</h3>
+            <form onSubmit={onSubmitFilter} className="filter-form flex align-center">
+                <input
+                    onChange={handleChange}
+                    value={txt}
+                    type="text"
+                    placeholder="Search"
+                    name="txt"
+                />
+                <select name="inStock" value={inStock || ''} onChange={handleChange}>
+                    <option value="">All</option>
+                    <option value="true">In Stock</option>
+                    <option value="false">Not in stock</option>
+                </select>
+                <select
+                    multiple
+                    name="labels"
+                    value={labels || []}
+                    onChange={handleChange}
+                >
+                    <option value="">Labels</option>
+                    <>
+                        {toyLabels.map(label => (
+                            <option key={label} value={label}>
+                                {label}
+                            </option>
+                        ))}
+                    </>
+                </select>
+            </form>
+            <ToySort sortBy={filterBy.sortBy} onSetFilter={onSetFilter} />
         </section>
     )
 }
