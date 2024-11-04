@@ -29,7 +29,6 @@ export function ToyDetails() {
     return (
         <section className="toy-details">
             <h2>toy name : {toy.name}</h2>
-            <h2>toy id : {toy._id}</h2>
             <h2>Price: ${toy.price}</h2>
             <h2>Labels:</h2>
             <ul className="label-list">
