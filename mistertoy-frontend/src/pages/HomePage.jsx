@@ -22,12 +22,16 @@ export function HomePage() {
 
             {/* Categories Section */}
             <section className="categories">
-                <h2>Shop by Category</h2>
+                <h2>Shop by Labels</h2>
                 <div className="category-list">
-                    <div className="category">Educational Toys</div>
-                    <div className="category">Outdoor Fun</div>
-                    <div className="category">Action Figures</div>
-                    <div className="category">Creative Arts</div>
+                    <div className="category">On wheels</div>
+                    <div className="category">Box game</div>
+                    <div className="category">Art</div>
+                    <div className="category">Baby</div>
+                    <div className="category">Doll</div>
+                    <div className="category">Puzzle</div>
+                    <div className="category">Outdoor</div>
+                    <div className="category">Battery Powered</div>
                 </div>
             </section>
         </div>

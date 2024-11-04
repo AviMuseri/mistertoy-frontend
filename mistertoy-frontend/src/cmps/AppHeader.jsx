@@ -3,8 +3,7 @@ import { NavLink } from "react-router-dom";
 export function AppHeader() {
     return (
         <header className="app-header full main-layout">
-
-            <section className="header-container">
+            <section className="header-container flex justify-between">
                 <h1>mister-toy !(yourToy)</h1>
                 <nav className="app-nav">
                     <NavLink to="/" >Home</NavLink>

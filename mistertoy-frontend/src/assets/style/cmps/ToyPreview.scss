@@ -1,0 +1,15 @@
+.car-preview {
+    text-align: center;
+    padding: 0.3em;
+    display: flex;
+    flex-direction: column;
+
+    & h4 {
+        text-transform: capitalize;
+        color: black;
+    }
+}
+
+// .car-preview .car-preview img {
+//     max-width: 100px;
+// }
