@@ -20,7 +20,7 @@ export function ToyIndex() {
 
     useEffect(() => {
         console.log(filterBy)
-        loadToys(filterBy).then()
+        loadToys(filterBy)
             .catch(err => {
                 showErrorMsg('Cannot load toys!', err)
             })

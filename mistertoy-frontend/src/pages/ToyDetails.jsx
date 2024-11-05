@@ -25,6 +25,7 @@ export function ToyDetails() {
                 navigate('/toy')
             })
     }
+
     if (!toy) return <div>Loading...</div>
     return (
         <section className="toy-details">
