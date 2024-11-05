@@ -9,12 +9,12 @@ export function AppHeader() {
     const [user, setUser] = useState(userService.getLoggedInUser())
     const navigate = useNavigate()
 
-    function onLogout() {
-        userService.logout().then(() => {
-            setUser(null)
-            navigate('/')
-        })
+    async function onLogout() {
+        await userService.logout()
+        setUser(null)
+        navigate('/')
     }
+
     return (
         <>
             <header className="app-header full main-layout">

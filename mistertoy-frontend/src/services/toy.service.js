@@ -76,26 +76,27 @@ function _getRandomLabels() {
     return randomLabels
 }
 
-function getLabelCounts() {
-    return query().then(({ toys }) => {
-        const labelCounts = {}
+async function getLabelCounts() {
+    const { toys } = await query()
+    const labelCounts = {}
 
-        toys.forEach(toy => {
-            toy.labels.forEach(label => {
-                if (labelCounts[label]) {
-                    labelCounts[label]++
-                } else {
-                    labelCounts[label] = 1
-                }
-            })
+    toys.forEach(toy => {
+        toy.labels.forEach(label => {
+            if (labelCounts[label]) {
+                labelCounts[label]++
+            } else {
+                labelCounts[label] = 1
+            }
         })
-        const labelCountArray = Object.entries(labelCounts).map(
-            ([label, count]) => ({
-                label,
-                count,
-            })
-        )
-        return labelCountArray
     })
+
+    const labelCountArray = Object.entries(labelCounts).map(
+        ([label, count]) => ({
+            label,
+            count,
+        })
+    )
+
+    return labelCountArray
 }
 

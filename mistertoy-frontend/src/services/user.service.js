@@ -26,8 +26,6 @@ function login({ username, password }) {
 }
 
 function signup(credentials) {
-  console.log(credentials);
-
   return axios
     .post('//localhost:3030/api/auth/signup', credentials)
     .then(res => res.data)

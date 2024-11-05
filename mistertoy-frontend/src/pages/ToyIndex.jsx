@@ -4,8 +4,8 @@ import { ToyList } from '../cmps/ToyList.jsx'
 import { toyService } from '../services/toy.service.js'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 import { loadToys, removeToy, saveToy, setFilterBy } from '../store/actions/toy.actions.js'
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { SET_FILTER_BY } from '../store/reducers/toy.reducer.js'
 
 export function ToyIndex() {
@@ -19,7 +19,6 @@ export function ToyIndex() {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log(filterBy)
         loadToys(filterBy)
             .catch(err => {
                 showErrorMsg('Cannot load toys!', err)
@@ -30,26 +29,26 @@ export function ToyIndex() {
         setFilterBy(filterBy)
     }
 
-    function onRemoveToy(toyId) {
-        removeToy(toyId)
-            .then(() => {
-                showSuccessMsg('Toy removed')
-            })
-            .catch(err => {
-                showErrorMsg('Cannot remove toy')
-            })
+    async function onRemoveToy(toyId) {
+        try {
+            await removeToy(toyId)
+            showSuccessMsg('Toy removed')
+        } catch (err) {
+            showErrorMsg('Cannot remove toy')
+        }
     }
 
-    function onAddToy() {
+
+    async function onAddToy() {
         const toyToSave = toyService.getRandomToy()
-        saveToy(toyToSave)
-            .then((savedToy) => {
-                showSuccessMsg(`Toy added (id: ${savedToy._id})`)
-            })
-            .catch(err => {
-                showErrorMsg('Cannot add toy')
-            })
+        try {
+            const savedToy = await saveToy(toyToSave)
+            showSuccessMsg(`Toy added (id: ${savedToy._id})`)
+        } catch (err) {
+            showErrorMsg('Cannot add toy')
+        }
     }
+
 
 
     function onChangePageIdx(diff) {

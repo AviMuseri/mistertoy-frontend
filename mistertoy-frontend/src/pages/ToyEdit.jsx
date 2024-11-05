@@ -17,14 +17,16 @@ export function ToyEdit() {
         if (toyId) loadToy()
     }, [])
 
-    function loadToy() {
-        toyService.getById(toyId)
-            .then(toy => setToyToEdit(toy))
-            .catch(err => {
-                console.log('Had issues in toy edit', err)
-                navigate('/toy')
-            })
+    async function loadToy() {
+        try {
+            const toy = await toyService.getById(toyId)
+            setToyToEdit(toy)
+        } catch (err) {
+            console.log('Had issues in toy edit', err)
+            navigate('/toy')
+        }
     }
+
 
     function handleChange({ target }) {
         const field = target.name
@@ -47,19 +49,20 @@ export function ToyEdit() {
         setToyToEdit(prevToyToEdit => ({ ...prevToyToEdit, [field]: value }))
     }
 
-    function onSaveToy(ev) {
+    async function onSaveToy(ev) {
         ev.preventDefault()
         if (!toyToEdit.price) toyToEdit.price = 1000
-        saveToy(toyToEdit)
-            .then(() => {
-                showSuccessMsg('Toy Saved!')
-                navigate('/toy')
-            })
-            .catch(err => {
-                console.log('Had issues in toy details', err)
-                showErrorMsg('Had issues in toy details')
-            })
+
+        try {
+            await saveToy(toyToEdit)
+            showSuccessMsg('Toy Saved!')
+            navigate('/toy')
+        } catch (err) {
+            console.log('Had issues in toy details', err)
+            showErrorMsg('Had issues in toy details')
+        }
     }
+
     const { name, price, inStock } = toyToEdit
     return (
         <section className="toy-edit">

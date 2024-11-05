@@ -11,32 +11,27 @@ export function LoginSignup({ setUser }) {
     isSignup ? signup(credentials) : login(credentials)
   }
 
-  function login(credentials) {
-    userService
-      .login(credentials)
-      .then(user => {
-        setUser(user)
-      })
-      .then(() => {
-        showSuccessMsg('Logged in successfully')
-      })
-      .catch(err => {
-        console.log('err', err)
-        showErrorMsg('Oops try again')
-      })
+  async function login(credentials) {
+    try {
+      const user = await userService.login(credentials)
+      setUser(user)
+      showSuccessMsg('Logged in successfully')
+    } catch (err) {
+      console.log('err', err)
+      showErrorMsg('Oops, try again')
+    }
   }
 
-  function signup(credentials) {
-    userService
-      .signup(credentials)
-      .then(setUser)
-      .then(() => {
-        showSuccessMsg('Signed in successfully')
-      })
-      .catch(err => {
-        showErrorMsg('Oops try again')
-      })
+  async function signup(credentials) {
+    try {
+      const user = await userService.signup(credentials)
+      setUser(user)
+      showSuccessMsg('Signed in successfully')
+    } catch (err) {
+      showErrorMsg('Oops, try again')
+    }
   }
+
 
   return (
     <section className="login">
